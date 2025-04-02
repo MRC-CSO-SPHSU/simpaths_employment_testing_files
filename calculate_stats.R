@@ -41,3 +41,29 @@ employment_rates <- population |>
   )
 
   employment_rates
+
+
+if (any(transition_rates$EmpToNotEmp > 0.10)) {
+  warning("Transition rates out of employment go as high as ", 
+          scales::percent_format(.1)(max(transition_rates$EmpToNotEmp)),
+          " (expected 3-5%)")
+}
+
+if (any(transition_rates$EmpToNotEmp < 0.02)) {
+  warning("Transition rates out of employment go as low as ", 
+          scales::percent_format(.1)(min(transition_rates$EmpToNotEmp)),
+          " (expected 3-5%)")
+}
+
+if (any(transition_rates$NotEmpToEmp > 0.35)) {
+  warning("Transition rates into employment go as high as ", 
+          scales::percent_format(.1)(max(transition_rates$NotEmpToEmp)),
+          " (expected 18-22%)")
+}
+
+if (any(transition_rates$NotEmpToEmp < 0.10)) {
+  warning("Transition rates into employment go as low as ", 
+          scales::percent_format(.1)(min(transition_rates$NotEmpToEmp)),
+          " (expected 18-22%)")
+}
+

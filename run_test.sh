@@ -1,11 +1,22 @@
 #! /usr/bin/bash
 
-end=$(expr $2 + 9)
+hash=$(git rev-parse HEAD)
+
+rm input/input* || echo "Clean input directory!\n"
+
+start=$(ls input/InitialPopulations/training | grep -o '[0-9]*')
+
+
+end=$(expr  $start + 9)
 
 mvn clean package
 
-java -jar singlerun.jar -c UK -s $2 -Setup -g false --rewrite-policy-schedule
+java -jar singlerun.jar -c UK -s $start -Setup -g false --rewrite-policy-schedule ||
+  java -jar singlerun.jar -c UK -s $start -Setup -g false
 
-java -jar multirun.jar -s $2 -e $end -n 1 -p 30000 -r $1 -g false -f
+java -jar multirun.jar -s $start -e $end -n 1 -p 30000 -r 999 -g false
 
-cp output/2025*_$1*/csv/Person.csv outfiles/run_$1.csv
+cp output/2025*_999*/csv/Person.csv outfiles/run_${hash:0:10}.csv &&
+    rm -r output/2025*_999*
+
+./calculate_stats.R ${hash:0:10}
