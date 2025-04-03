@@ -16,7 +16,7 @@ java -jar singlerun.jar -c UK -s $start -Setup -g false --rewrite-policy-schedul
 
 java -jar multirun.jar -s $start -e $end -n 1 -p 30000 -r 999 -g false
 
-cp output/2025*_999*/csv/Person.csv outfiles/run_${hash:0:10}.csv &&
-    rm -r output/2025*_999*
+cp output/2025*/csv/Person.csv outfiles/run_${hash:0:10}.csv &&
+    rm -r output/2025*
 
 ./calculate_stats.R ${hash:0:10}
