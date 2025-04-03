@@ -9,7 +9,7 @@ start=$(ls input/InitialPopulations/training | grep -o '[0-9]*')
 
 end=$(expr  $start + 9)
 
-mvn clean package
+mvn clean package && {
 
 java -jar singlerun.jar -c UK -s $start -Setup -g false --rewrite-policy-schedule ||
   java -jar singlerun.jar -c UK -s $start -Setup -g false
@@ -20,3 +20,4 @@ cp output/2025*/csv/Person.csv outfiles/run_${hash:0:10}.csv &&
     rm -r output/2025*
 
 ./calculate_stats.R ${hash:0:10}
+}

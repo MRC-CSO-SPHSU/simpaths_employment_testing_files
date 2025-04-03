@@ -31,7 +31,7 @@ transition_rates <- population |>
     .by = c("time")) |> 
   filter(!is.na(NotEmpToEmp))
 
-transition_rates
+  print(transition_rates)
 
 employment_rates <- population |> 
   as_tibble() |>
@@ -83,10 +83,12 @@ extract_latest_commit <- function() {
 
 }
 
-left_join(transition_rates, employment_rates, by = c("time")) |>
-    bind_cols(extract_latest_commit()) |>
-    write.table("results.txt", append = TRUE, sep = "\t", row.names = FALSE, 
-    col.names = FALSE)
+
+    out_table <- left_join(transition_rates, employment_rates, by = c("time")) |>
+        bind_cols(extract_latest_commit()) |>
+        mutate(good_or_bad = "")
+
+
 }, error = function(e) {
     warning("Commit ", hash, " failed to run!")
 
@@ -94,7 +96,7 @@ left_join(transition_rates, employment_rates, by = c("time")) |>
     git2r::commits() |>
     _[1]
 
-    tibble(
+    out_table <- tibble(
         time = NA,
         NotEmpToEmp = NA,
         EmpToNotEmp = NA,
@@ -102,9 +104,26 @@ left_join(transition_rates, employment_rates, by = c("time")) |>
         sha = latest[[1]]$sha,
         author = latest[[1]]$author$name,
         date = as.character(latest[[1]]$author$when, tz = "GMT"),
-        summary = latest[[1]]$summary
-    ) |>
+        summary = latest[[1]]$summary,
+        good_or_bad = "not run"
+    )
+
+})
+
+read_result_from_console <- function() {
+  cat("Good or bad? (G/b)")
+  good_or_bad <- readLines("stdin", n = 1)
+  if(grepl("[gG]", good_or_bad)) return("good")
+  if(good_or_bad == "") return("good")
+  if(grepl("[bB]", good_or_bad)) return("bad")
+
+  read_result_from_console()
+
+}
+
+
+out_table |>
+    mutate(good_or_bad = if_else(good_or_bad == "not run", good_or_bad, read_result_from_console())) |>
     write.table("results.txt", append = TRUE, sep = "\t", row.names = FALSE, 
     col.names = FALSE)
 
-})
